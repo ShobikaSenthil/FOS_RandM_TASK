@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { fetchCharacters } from "./services/api"
+import CharacterList from "./components/characters/CharacterList";
 
 function App() {
   const [characters, setCharacters] = useState([])
@@ -12,7 +13,7 @@ function App() {
       const data = await fetchCharacters({ page, name, status });
       setCharacters(data.results);
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error while fetching data", error);
       setCharacters([]);
     }
   };
@@ -22,9 +23,9 @@ function App() {
   }, [page, name, status]);
 
   return (
-    characters.map((character) => {
-      return <h2>{character.name}</h2>
-    })
+    <>
+      <CharacterList characters={characters} />
+    </>
   )
 }
 
