@@ -14,4 +14,4 @@ const CharacterList = ({ characters }) => {
     )
 }
 
-export default CharacterList
+export default React.memo(CharacterList)

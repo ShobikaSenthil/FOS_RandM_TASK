@@ -3,7 +3,7 @@ import { fetchCharacters } from "./services/api"
 import CharacterList from "./components/characters/CharacterList";
 import Navbar from "./components/Navbar";
 import { Container, Toolbar, Typography, Box, CircularProgress } from "@mui/material";
-import Pagination from "./components/characters/Pagination"
+import Pagination from "./components/Pagination"
 import { useDebounce } from "./hooks/useDebounce";
 
 function App() {
@@ -70,11 +70,10 @@ function App() {
           ) : (
             <>
               <CharacterList characters={characters} />
-              <Pagination page={page} setPage={setPage} totalPages={totalPages} />
             </>
           )
         }
-
+        <Pagination page={page} setPage={setPage} totalPages={totalPages} />
       </Container >
     </>
   )

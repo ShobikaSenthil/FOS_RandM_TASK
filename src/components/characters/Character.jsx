@@ -23,4 +23,4 @@ const Character = ({ character }) => {
   )
 }
 
-export default Character
+export default React.memo(Character)
