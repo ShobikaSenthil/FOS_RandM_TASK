@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { fetchCharacters } from "./services/api"
 import CharacterList from "./components/characters/CharacterList";
 import Navbar from "./components/Navbar";
-import { Container, Toolbar, Typography, Box } from "@mui/material";
+import { Container, Toolbar, Typography, Box, CircularProgress } from "@mui/material";
 import Pagination from "./components/characters/Pagination"
 import { useDebounce } from "./hooks/useDebounce";
 
@@ -12,16 +12,23 @@ function App() {
   const [name, setName] = useState("");
   const [status, setStatus] = useState("");
   const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const debouncedName = useDebounce(name, 500);
   const getData = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const data = await fetchCharacters({ page, name: debouncedName || undefined, status });
       setCharacters(data.results);
       setTotalPages(data.info.pages);
-    } catch (error) {
-      console.error("Error while fetching data", error);
+    } catch (err) {
+      console.error("Error while fetching data", err);
+      setError("Something went wrong. Please try again.");
       setCharacters([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,18 +50,29 @@ function App() {
       />
       <Toolbar />
       <Container sx={{ mt: 2 }}>
-        {characters.length === 0 ? (
+        {loading ? (
           <Box textAlign="center" mt={5}>
-            < Typography variant="h6" color="text.secondary">
-              No characters found
+            < CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box textAlign="center" mt={5}>
+            <Typography color="error" variant="h6">
+              {error}
             </Typography>
-          </Box >
-        ) : (
-          <>
-            <CharacterList characters={characters} />
-            <Pagination page={page} setPage={setPage} totalPages={totalPages} />
-          </>
-        )
+          </Box>
+        ) :
+          characters.length === 0 ? (
+            <Box textAlign="center" mt={5}>
+              < Typography variant="h6" color="text.secondary">
+                No characters found
+              </Typography>
+            </Box >
+          ) : (
+            <>
+              <CharacterList characters={characters} />
+              <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+            </>
+          )
         }
 
       </Container >
