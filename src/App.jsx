@@ -5,36 +5,25 @@ import Navbar from "./components/Navbar";
 import { Container, Toolbar, Typography, Box, CircularProgress } from "@mui/material";
 import Pagination from "./components/Pagination"
 import { useDebounce } from "./hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
 
 function App() {
-  const [characters, setCharacters] = useState([])
+  // const [characters, setCharacters] = useState([])
   const [page, setPage] = useState(1);
   const [name, setName] = useState("");
   const [status, setStatus] = useState("");
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const debouncedName = useDebounce(name, 500);
-  const getData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchCharacters({ page, name: debouncedName || undefined, status });
-      setCharacters(data.results);
-      setTotalPages(data.info.pages);
-    } catch (err) {
-      console.error("Error while fetching data", err);
-      setError("Something went wrong. Please try again.");
-      setCharacters([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    getData();
-  }, [page, debouncedName, status]);
+
+  const { data, isLoading, IsError, error } = useQuery({
+    queryKey: ["characters", page, debouncedName, status],
+    queryFn: () => fetchCharacters({ page, name: debouncedName || undefined, status }),
+    keyPreviousData: true
+  })
+  const characters = data?.results || [];
+
+  const totalPages = data?.info?.pages || 1;
 
   useEffect(() => {
     setPage(1);
@@ -50,11 +39,11 @@ function App() {
       />
       <Toolbar />
       <Container sx={{ mt: 2 }}>
-        {loading ? (
+        {isLoading ? (
           <Box textAlign="center" mt={5}>
             < CircularProgress />
           </Box>
-        ) : error ? (
+        ) : IsError ? (
           <Box textAlign="center" mt={5}>
             <Typography color="error" variant="h6">
               {error}
