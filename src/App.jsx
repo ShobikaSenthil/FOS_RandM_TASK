@@ -6,17 +6,16 @@ import { Container, Toolbar, Typography, Box, CircularProgress } from "@mui/mate
 import Pagination from "./components/Pagination"
 import { useDebounce } from "./hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
+import CharacterSkeleton from "./components/characters/CharacterSkeleton";
 
 function App() {
-  // const [characters, setCharacters] = useState([])
   const [page, setPage] = useState(1);
   const [name, setName] = useState("");
   const [status, setStatus] = useState("");
 
   const debouncedName = useDebounce(name, 500);
 
-
-  const { data, isLoading, IsError, error } = useQuery({
+  const { data, isLoading, isFetching, IsError, error } = useQuery({
     queryKey: ["characters", page, debouncedName, status],
     queryFn: () => fetchCharacters({ page, name: debouncedName || undefined, status }),
     keyPreviousData: true
@@ -40,9 +39,7 @@ function App() {
       <Toolbar />
       <Container sx={{ mt: 2 }}>
         {isLoading ? (
-          <Box textAlign="center" mt={5}>
-            < CircularProgress />
-          </Box>
+          <CharacterSkeleton />
         ) : IsError ? (
           <Box textAlign="center" mt={5}>
             <Typography color="error" variant="h6">
@@ -62,7 +59,7 @@ function App() {
             </>
           )
         }
-        <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+        <Pagination page={page} setPage={setPage} totalPages={totalPages} disabled={isFetching} />
       </Container >
     </>
   )
